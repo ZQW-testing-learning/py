@@ -1,5 +1,5 @@
-from flask import Flask, request, session
-caches = []
+from flask import Flask, request
+caches = [] # 数据缓存
 
 app = Flask(__name__)
 
