@@ -1,11 +1,14 @@
 
 
 def alreadyExist(append_user):
+    """
+    check if the user already exists in the container
+    """
     def dec(*args, **kvarg):
         addItem = args[0]
         container = args[1]
         al = filter(lambda n: n["name"] == addItem["name"], container)
-        existLen = len(list(al))
+        existLen: int = len(list(al))
         if (bool(existLen)):
             raise Exception('The user already exists')
         print("check user", args, kvarg)
