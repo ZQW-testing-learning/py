@@ -27,9 +27,11 @@ class jsonChunks {
      */
     parseChunk(chunk) {
         this.startChunkIndex++
-        let chunkSplit = chunk.split("")
-        let braces = chunkSplit.filter(v => this.isLeftBrace(v) || this.isRightBrace(v))
-        console.log("parse chunk", braces);
+        let i = 0
+        while (i < chunk.length) {
+            console.log(chunk[i]);
+            i++
+        }
         
     }
 }
