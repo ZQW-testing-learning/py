@@ -1,11 +1,13 @@
-from flask import Blueprint, request
+from flask import Blueprint, request, current_app
 from .control import append_user
-
+from app.db import get_db
 dataCaches = []
 user = Blueprint('user', __name__, url_prefix='/user')
 
 @user.get("/all")
 def get_all_user():
+    db = get_db()
+    print(db.execute)
     return dataCaches
 
 
