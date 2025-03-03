@@ -1,11 +1,5 @@
 # from app.db import get_db
 
-def data_to_sql_format(opts: dict):
-    for k, v in opts.items():
-        if type(opts[k]) == str:
-            opts[k] = f'"{v}"'
-    return opts
-
 
 
 def create_database(tname: str, properties: dict):
@@ -16,18 +10,18 @@ def create_database(tname: str, properties: dict):
         
     return f'''CREATE TABLE IF NOT EXISTS {tname} ({PPS})'''
 
-def insert(tname: str, opts: dict):
-    pps = []
-    print("insert...", opts.items())
-    for k in opts:
-        print('for :', k)
-    # for k, v in opts.items():
-    #     pps.append()
+def insert(tname: str, **opts: dict):
+    fk = ', '.join([k for k in opts.keys()])
+    fv = ', '.join([f"'{v}'" if isinstance(v, str) else str(v) for v in opts.values() ])
+    return f'''INSERT INTO {tname} ({fk}) VALUES ({fv})'''
 
+def update(tname: str, **opts: dict):
+    where = opts.get('where', None)
+    ws = []
+    # if where is not None:
+        
+    return f'''UPDATE {tname} SET WHERE '''
 
 if __name__ == "__main__":
     # print(create_database('users', {"id": "INTEGER PRIMARY KEY AUTOINCREMENT", "name": "TEXT", "age": "INTEGER"}))
-    insert("users", {
-        "name": "zqw",
-        "age": 25
-    })
+    print(insert("users", name='zqw', age=25))
