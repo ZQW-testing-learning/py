@@ -1,6 +1,8 @@
 # from app.db import get_db
 
-
+class Mode:
+    def __init__():
+        print('Mode init')
 
 def create_database(tname: str, properties: dict):
     pps = []
