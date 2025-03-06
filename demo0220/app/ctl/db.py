@@ -23,12 +23,12 @@ class Mode:
         fv = ', '.join([f"'{v}'" if isinstance(v, str) else str(v) for v in opts.values() ])
         return f'''INSERT INTO {self.table_name} ({fk}) VALUES ({fv})'''
 
-    def update(tname: str, **opts: dict):
+    def update(self, **opts: dict):
         where = opts.get('where', None)
         ws = []
         # if where is not None:
             
-        return f'''UPDATE {tname} SET WHERE '''
+        return f'''UPDATE {self.table_name} SET WHERE '''
 
     @classmethod
     def get_class_name(cls):

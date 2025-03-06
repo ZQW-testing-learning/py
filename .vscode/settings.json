@@ -1,0 +1,8 @@
+{
+    // "python.analysis.typeCheckingMode": "basic",
+    // "python.languageServer": "Pylance",
+    // "python.analysis.inlayHints.variableTypes": false,
+    // "python.analysis.inlayHints.functionReturnTypes": false,
+    // "python.analysis.generateWithTypeAnnotation": false,
+    // "python.analysis.inlayHints.pytestParameters": false
+}
