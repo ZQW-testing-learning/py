@@ -206,15 +206,15 @@ op2 = {
 }
 try:
     user.start_transaction()
-    # user.create_table(cp)
-    # user.insert(**op)
+    user.create_table(cp)
+    user.insert(**op)
     user.insert(**op2)
     user.commit()
     rows = user.fetchall()
     print(rows)
 except Exception as e:
     user.rollback()
-    print(e)
+    print("################ ERROR ################", "\n", e)
     rows = user.fetchall()
     print(rows)
 
