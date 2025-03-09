@@ -6,11 +6,7 @@ from datetime import datetime
 # 数据库基类
 class DataBase(ABC):
 
-    __DB__: sqlite3
-
-    def __new__(cls, DB=None, **cfg):
-        cls.__DB__ = DB
-        return super().__new__(cls)
+    __DB__: Optional[sqlite3.Connection] = None
     
     def __init__(self, DB=None, **cfg: dict):
         self.database = cfg.get("database", None)
@@ -65,10 +61,23 @@ class DataBase(ABC):
 
 class Sqlite3(DataBase):
     __DB__ = None
+
+    def __new__(cls, DB=None, **cfg: dict):
+        if cls.__DB__ is None:
+            print("数据库初始化连接...")
+            dbstr = cfg.get("database", None)
+            cls.__DB__ = DB.connect(dbstr)
+            cls.__DB__.row_factory = DB.Row
+        else:
+            print("数据库已连接")
+        return super().__new__(cls)
+
     def Connect(self):
         if not self.conn:
-            self.conn = Sqlite3.__DB__.connect('test.db')
-            self.conn.row_factory = Sqlite3.__DB__.Row
+            print("conn not exist, create new conn")
+            self.conn = Sqlite3.__DB__
+        else:
+            print("conn exist, use old conn")
         return self.conn
     
     def Close(self):
@@ -76,10 +85,15 @@ class Sqlite3(DataBase):
         if self.conn is not None:
             self.conn.close()
             self.conn = None
+            Sqlite3.__DB__ = None
+        return self.conn
     
     def Cursor(self):
         if not self.cursor:
+            print("cursor not exist, create new cursor")
             self.cursor = self.conn.cursor()
+        else:
+            print("cursor exist, use old cursor")
         return self.cursor
     
     def closeCursor(self):
@@ -90,37 +104,56 @@ class Sqlite3(DataBase):
             
 
     def start_transaction(self):
+        cur = self.Cursor()
+        cur.execute("BEGIN TRANSACTION")
         print("start transaction")
 
     def commit(self):
+        self.conn.commit()
         print("commit")
 
     def rollback(self):
+        self.conn.rollback()
         print("rollback")
 
 
 class Mode:
     def __init__(self, **kwargs):
+        self.db = Sqlite3(sqlite3, user="root", database="test.db")
+        self.conn = self.db.Connect()
         self.table_name = self.__class__.get_class_name().lower()
         self.properties = kwargs
-        print('Mode init', self.properties)
 
     def __iter__(self):
         for k, v in self.properties.items():
             yield k, v
+
+
+    def start_transaction(self):
+        self.db.start_transaction()
+    
+    def commit(self):
+        self.db.commit()
+    
+    def rollback(self):
+        self.db.rollback()
 
     def create_table(self, properties: dict):
         pps = []
         for k, v in properties.items():
             pps.append(f"{k} {v}")
         PPS = ", ".join(pps)
-            
-        return f'''CREATE TABLE IF NOT EXISTS {self.table_name} ({PPS})'''
+        cur = self.db.Cursor()
+        cur.execute(f'''CREATE TABLE IF NOT EXISTS {self.table_name} ({PPS})''')
+        print("create table ok")
+
 
     def insert(self, **opts: dict):
         fk = ', '.join([k for k in opts.keys()])
         fv = ', '.join([f"'{v}'" if isinstance(v, str) else str(v) for v in opts.values() ])
-        return f'''INSERT INTO {self.table_name} ({fk}) VALUES ({fv})'''
+        cur = self.db.Cursor()
+        cur.execute(f'''INSERT INTO {self.table_name} ({fk}) VALUES ({fv})''')
+        print("insert ok")
 
     def update(self, **opts: dict):
         where = opts.get('where', None)
@@ -128,7 +161,11 @@ class Mode:
         return f'''UPDATE {self.table_name} SET WHERE '''
     
     def fetchall(self):
-        return f'''SELECT * FROM {self.table_name}'''
+        cur = self.db.Cursor()
+        cur.execute(f'''SELECT * FROM {self.table_name}''')
+        rows = cur.fetchall()
+        print('fetchall ok')
+        return [dict(row) for row in rows]
 
     @classmethod
     def get_class_name(cls):
@@ -142,50 +179,45 @@ class Users(Mode):
     phone: str = ''
     
 
-d = Sqlite3(sqlite3, user="root")
-conn = d.Connect()
-cursor = d.Cursor()
 user = Users()
 
-# cp = {
-#     "id": "INTEGER PRIMARY KEY AUTOINCREMENT",
-#     "name": "TEXT NOT NULL",
-#     "phone": "TEXT",
-#     "department": "TEXT",
-#     "create_at": "TEXT",
-#     "roles": "TEXT"
-# }
+cp = {
+    "id": "INTEGER PRIMARY KEY AUTOINCREMENT",
+    "name": "TEXT UNIQUE NOT NULL",
+    "phone": "TEXT",
+    "department": "TEXT",
+    "create_at": "TEXT",
+    "roles": "TEXT"
+}
 
-# cursor.execute(user.create_table(cp))
+now = datetime.now()
+dtstr = f"{now.year}-{now.month}-{now.day} {now.hour}:{now.minute}:{now.second}"
+op = {
+    "name": "王盼",
+    "phone": "111111111111",
+    "department": "技术部",
+    "create_at": dtstr
+}
+op2 = {
+    "name": "郑泉伟",
+    "phone": "13173846355",
+    "department": "技术部",
+    "create_at": dtstr
+}
+try:
+    user.start_transaction()
+    # user.create_table(cp)
+    # user.insert(**op)
+    user.insert(**op2)
+    user.commit()
+    rows = user.fetchall()
+    print(rows)
+except Exception as e:
+    user.rollback()
+    print(e)
+    rows = user.fetchall()
+    print(rows)
 
-# now = datetime.now()
-# dtstr = f"{now.year}-{now.month}-{now.day} {now.hour}:{now.minute}:{now.second}"
-# op = {
-#     "name": "王盼",
-#     "phone": "111111111111",
-#     "department": "技术部",
-#     "create_at": dtstr
-# }
-# op2 = {
-#     "name": "郑泉伟",
-#     "phone": "13173846355",
-#     "department": "技术部",
-#     "create_at": dtstr
-# }
-
-# cursor.execute(user.insert(**op))
-# cursor.execute(user.insert(**op2))
-# conn.commit()
-# print("insert sql", sql_insert_text)
-# cursor.execute(sql_insert_text)
-# cur = cursor.execute()
-
-# sql_all_text = user.fetchall()
-cursor.execute("SELECT * FROM users")
-rows = cursor.fetchall()
-print('fetchall', [dict(row) for row in rows])
-
-# d.Close()
 
 
 
