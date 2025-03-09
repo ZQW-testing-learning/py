@@ -2,6 +2,7 @@ import sqlite3
 from sqlite3 import Cursor
 from abc import ABC, abstractmethod
 from typing import Any, Optional
+from datetime import datetime
 # 数据库基类
 class DataBase(ABC):
 
@@ -124,9 +125,10 @@ class Mode:
     def update(self, **opts: dict):
         where = opts.get('where', None)
         ws = []
-        # if where is not None:
-            
         return f'''UPDATE {self.table_name} SET WHERE '''
+    
+    def fetchall(self):
+        return f'''SELECT * FROM {self.table_name}'''
 
     @classmethod
     def get_class_name(cls):
@@ -141,26 +143,49 @@ class Users(Mode):
     
 
 d = Sqlite3(sqlite3, user="root")
-d.Connect()
+conn = d.Connect()
 cursor = d.Cursor()
-user = Users(name="zqw", phone="1234567890", department="技术研发")
+user = Users()
 
-sql_create_text = user.create_table({
-    "id": "INTEGER PRIMARY KEY AUTOINCREMENT",
-    "name": "TEXT NOT NULL",
-    "phone": "TEXT",
-    "department": "TEXT",
-    "create_at": "TEXT"
-})
+# cp = {
+#     "id": "INTEGER PRIMARY KEY AUTOINCREMENT",
+#     "name": "TEXT NOT NULL",
+#     "phone": "TEXT",
+#     "department": "TEXT",
+#     "create_at": "TEXT",
+#     "roles": "TEXT"
+# }
 
-sql_text = user.insert({
-    "name": "郑泉伟",
-    # ""
-})
+# cursor.execute(user.create_table(cp))
 
-cursor.execute(sql_text)
+# now = datetime.now()
+# dtstr = f"{now.year}-{now.month}-{now.day} {now.hour}:{now.minute}:{now.second}"
+# op = {
+#     "name": "王盼",
+#     "phone": "111111111111",
+#     "department": "技术部",
+#     "create_at": dtstr
+# }
+# op2 = {
+#     "name": "郑泉伟",
+#     "phone": "13173846355",
+#     "department": "技术部",
+#     "create_at": dtstr
+# }
 
-d.Close()
+# cursor.execute(user.insert(**op))
+# cursor.execute(user.insert(**op2))
+# conn.commit()
+# print("insert sql", sql_insert_text)
+# cursor.execute(sql_insert_text)
+# cur = cursor.execute()
+
+# sql_all_text = user.fetchall()
+cursor.execute("SELECT * FROM users")
+rows = cursor.fetchall()
+print('fetchall', [dict(row) for row in rows])
+
+# d.Close()
 
 
 
