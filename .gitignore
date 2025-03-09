@@ -172,3 +172,8 @@ cython_debug/
 
 # Custom ignore content
 .DS_Store
+
+# DB files
+*.sqlite3
+*.sqlite3-journal
+/**/*.db
