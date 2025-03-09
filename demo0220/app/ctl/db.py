@@ -10,7 +10,7 @@ class Mode:
         for k, v in self.properties.items():
             yield k, v
 
-    def create_database(self, properties: dict):
+    def create_table(self, properties: dict):
         pps = []
         for k, v in properties.items():
             pps.append(f"{k} {v}")
@@ -45,4 +45,11 @@ class Users(Mode):
 
 if __name__ == "__main__":
     u = Users(name="zqw", age=25, phone="1234567890")
-    print(u.insert(**dict(u)))
+    c = u.create_table({
+        "id": "INTEGER PRIMARY KEY",
+        "name": "TEXT NOT NULL",
+        "phone": "TEXT",
+        "department": "TEXT",
+        "create_at": "TEXT"
+    })
+    print(c)
