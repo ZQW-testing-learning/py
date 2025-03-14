@@ -60,24 +60,15 @@ class DataBase(ABC):
 
 
 class Sqlite3(DataBase):
-    __DB__ = None
-
-    def __new__(cls, DB=None, **cfg: dict):
-        if cls.__DB__ is None:
-            print("数据库初始化连接...")
-            dbstr = cfg.get("database", None)
-            cls.__DB__ = DB.connect(dbstr)
-            cls.__DB__.row_factory = DB.Row
-        else:
-            print("数据库已连接")
-        return super().__new__(cls)
 
     def Connect(self):
         if not self.conn:
             print("conn not exist, create new conn")
-            self.conn = Sqlite3.__DB__
+            self.conn = sqlite3.connect(self.database)
+            self.conn.row_factory = sqlite3.Row
         else:
             print("conn exist, use old conn")
+            self.conn = None
         return self.conn
     
     def Close(self):
