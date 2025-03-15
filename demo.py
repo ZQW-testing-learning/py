@@ -76,7 +76,6 @@ class Sqlite3(DataBase):
         if self.conn is not None:
             self.conn.close()
             self.conn = None
-            Sqlite3.__DB__ = None
         return self.conn
     
     def Cursor(self):
@@ -170,7 +169,7 @@ class Users(Mode):
     phone: str = ''
     
 
-user = Users()
+# user = Users()
 
 cp = {
     "id": "INTEGER PRIMARY KEY AUTOINCREMENT",
@@ -181,33 +180,33 @@ cp = {
     "roles": "TEXT"
 }
 
-now = datetime.now()
-dtstr = f"{now.year}-{now.month}-{now.day} {now.hour}:{now.minute}:{now.second}"
-op = {
-    "name": "eesdf",
-    "phone": "111111111111",
-    "department": "技术部",
-    "create_at": dtstr
-}
-op2 = {
-    "name": "sdfsdfewff",
-    "phone": "vvvv4dcccc5",
-    "department": "技术部",
-    "create_at": dtstr
-}
-try:
-    user.start_transaction()
-    user.create_table(cp)
-    user.insert(**op)
-    user.insert(**op2)
-    user.commit()
-    rows = user.fetchall()
-    print(rows)
-except Exception as e:
-    user.rollback()
-    print("################ ERROR ################", "\n", e)
-    rows = user.fetchall()
-    print(rows)
+# now = datetime.now()
+# dtstr = f"{now.year}-{now.month}-{now.day} {now.hour}:{now.minute}:{now.second}"
+# op = {
+#     "name": "eesdf",
+#     "phone": "111111111111",
+#     "department": "技术部",
+#     "create_at": dtstr
+# }
+# op2 = {
+#     "name": "sdfsdfewff",
+#     "phone": "vvvv4dcccc5",
+#     "department": "技术部",
+#     "create_at": dtstr
+# }
+# try:
+#     user.start_transaction()
+#     user.create_table(cp)
+#     user.insert(**op)
+#     user.insert(**op2)
+#     user.commit()
+#     rows = user.fetchall()
+#     print(rows)
+# except Exception as e:
+#     user.rollback()
+#     print("################ ERROR ################", "\n", e)
+#     rows = user.fetchall()
+#     print(rows)
 
 
 
