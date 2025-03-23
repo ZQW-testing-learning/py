@@ -187,6 +187,11 @@ class Mode:
         cur.execute(f'''SELECT * FROM {self.table_name} WHERE {where}''')
         rows = cur.fetchall()
         return [dict(row) for row in rows]
+    
+    def LIKE(self, field: str, mode: str):
+        return f"{field} LIKE '{mode}'"
+    def WHERE(self, field: str, value: str):
+        return f"{field}='{value}'"
         
 
     @classmethod
