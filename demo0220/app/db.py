@@ -130,7 +130,7 @@ class Sqlite3(DataBase):
 
 class Mode:
     def __init__(self, **kwargs):
-        self.db = Sqlite3(sqlite3, user="root", database="test.db")
+        self.db = Sqlite3(sqlite3, user="root", database="../test.db")
         self.conn = self.db.Connect()
         self.table_name = self.__class__.get_class_name().lower()
         self.properties = kwargs
